@@ -1,0 +1,167 @@
+[
+  {
+    "job_id": "j1",
+    "title": "Backend Intern (Python/AWS)",
+    "company": "Acme",
+    "location": "Bengaluru",
+    "type": "Internship",
+    "skills": ["python", "aws", "lambda", "api"],
+    "description": "Build and test serverless functions on AWS. Work with API Gateway, Lambda, and DynamoDB."
+  },
+  {
+    "job_id": "j2",
+    "title": "AI/ML Intern (RAG/NLP)",
+    "company": "Innotech",
+    "location": "Bengaluru",
+    "type": "Internship",
+    "skills": [
+      "python",
+      "rag",
+      "nlp",
+      "opensearch",
+      "bedrock",
+      "sagemaker",
+      "langchain",
+      "s3",
+      "lambda"
+    ],
+    "description": "Prototype a retrieval-augmented generation workflow on AWS using Bedrock embeddings and OpenSearch k-NN; evaluate retrieval quality."
+  },
+  {
+    "job_id": "j3",
+    "title": "Data Engineering Intern (ETL/Athena)",
+    "company": "DataWorks",
+    "location": "Bengaluru",
+    "type": "Internship",
+    "skills": [
+      "python",
+      "s3",
+      "glue",
+      "athena",
+      "lambda",
+      "etl",
+      "pandas",
+      "parquet"
+    ],
+    "description": "Ingest raw CSV/JSON to S3, transform with AWS Glue jobs, and expose queryable datasets through Athena."
+  },
+  {
+    "job_id": "j4",
+    "title": "DevOps Intern (CI/CD & IaC)",
+    "company": "CloudForge",
+    "location": "Bengaluru",
+    "type": "Internship",
+    "skills": [
+      "terraform",
+      "aws cdk",
+      "cloudformation",
+      "github actions",
+      "docker",
+      "ecr",
+      "ecs",
+      "iam"
+    ],
+    "description": "Build CI/CD pipelines with GitHub Actions, containerize apps, and deploy to ECS using Terraform/CDK."
+  },
+  {
+    "job_id": "j5",
+    "title": "Frontend Intern (React + AWS)",
+    "company": "PixelLabs",
+    "location": "Bengaluru",
+    "type": "Internship",
+    "skills": [
+      "react",
+      "javascript",
+      "s3",
+      "cloudfront",
+      "cognito",
+      "api gateway"
+    ],
+    "description": "Create a React SPA, host on S3 behind CloudFront, integrate Cognito auth and call serverless APIs."
+  },
+  {
+    "job_id": "j6",
+    "title": "MLOps Intern (SageMaker Pipelines)",
+    "company": "ModelOps Co",
+    "location": "Bengaluru",
+    "type": "Internship",
+    "skills": [
+      "sagemaker",
+      "docker",
+      "ecr",
+      "python",
+      "mlflow",
+      "feature store",
+      "cloudwatch"
+    ],
+    "description": "Implement training/evaluation pipelines on SageMaker, track experiments, and set up model monitoring."
+  },
+  {
+    "job_id": "j7",
+    "title": "Cloud Security Intern",
+    "company": "ShieldTech",
+    "location": "Bengaluru",
+    "type": "Internship",
+    "skills": [
+      "iam",
+      "kms",
+      "cloudtrail",
+      "config",
+      "security hub",
+      "guardduty"
+    ],
+    "description": "Harden AWS accounts with IAM least privilege, enable KMS encryption, and build compliance dashboards."
+  },
+  {
+    "job_id": "j8",
+    "title": "SRE Intern (Monitoring & Resilience)",
+    "company": "Reliant Systems",
+    "location": "Bengaluru",
+    "type": "Internship",
+    "skills": [
+      "cloudwatch",
+      "x-ray",
+      "alarms",
+      "autoscaling",
+      "alb",
+      "route 53",
+      "lambda"
+    ],
+    "description": "Define SLOs, set CloudWatch alarms/dashboards, trace requests with X-Ray, and implement auto-healing."
+  },
+  {
+    "job_id": "j9",
+    "title": "Full-Stack Intern (Serverless)",
+    "company": "StackJet",
+    "location": "Bengaluru",
+    "type": "Internship",
+    "skills": [
+      "nodejs",
+      "python",
+      "api gateway",
+      "lambda",
+      "dynamodb",
+      "sqs",
+      "sns",
+      "step functions"
+    ],
+    "description": "Build serverless REST/queues with API Gateway, Lambda, DynamoDB, SQS/SNS, and Step Functions."
+  },
+  {
+    "job_id": "j10",
+    "title": "Generative AI Intern (Document Intelligence)",
+    "company": "NovoAI",
+    "location": "Remote (India)",
+    "type": "Internship",
+    "skills": [
+      "bedrock",
+      "claude",
+      "titan embeddings",
+      "textract",
+      "translate",
+      "python",
+      "s3"
+    ],
+    "description": "Use Textract to parse PDFs, Bedrock for embeddings and Claude prompts, and generate insights from documents."
+  }
+]

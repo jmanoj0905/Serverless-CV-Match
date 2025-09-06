@@ -1,0 +1,125 @@
+# Resume Match
+# Author: Manoj J (@jmanoj0905)
+# Description: S3->Lambda pipeline using Textract + Bedrock (Titan, Claude)
+
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Resume Match (S3 static page + S3->Lambda + Textract + Bedrock)
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: S3 bucket for site uploads
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 120
+    MemorySize: 1024
+    Tracing: Active
+
+Resources:
+  # Analysis Lambda: Textract -> Bedrock embeddings -> rank jobs -> Bedrock summary -> write results JSON
+  AnalyzeFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: analyze_fn/
+      Handler: app.handler
+      Environment:
+        Variables:
+          BUCKET: !Ref BucketName
+          JOBS_KEY: jobs/jobs.json
+          EMBED_MODEL: amazon.titan-embed-text-v1
+          LLM_MODEL: anthropic.claude-3-sonnet-20240229-v1:0
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+              Resource:
+                - !Sub arn:aws:s3:::${BucketName}/*
+            - Effect: Allow
+              Action:
+                - textract:StartDocumentTextDetection
+                - textract:GetDocumentTextDetection
+              Resource: "*"
+            - Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource: "*"
+
+  # Permission so S3 can invoke the Lambda when new objects land in resumes/
+  AnalyzeFnPermissionForS3:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref AnalyzeFn
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt SiteBucket.Arn
+
+  # Main bucket: hosts the static page, stores uploaded resumes and JSON results
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    DependsOn: AnalyzeFnPermissionForS3
+    Properties:
+      BucketName: !Ref BucketName
+      WebsiteConfiguration:
+        IndexDocument: upload.html
+      # Allow browser PUT resumes + GET results via AWS SDK (Cognito creds)
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins: ["*"]
+            AllowedMethods: ["GET", "PUT", "HEAD"]
+            AllowedHeaders: ["*"]
+            ExposedHeaders: ["ETag"]
+            MaxAge: 3000
+      # Let public bucket policy take effect ONLY for upload.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        IgnorePublicAcls: false
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt AnalyzeFn.Arn
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: resumes/
+
+  # Make ONLY upload.html publicly readable (site is viewable; uploads/results stay private)
+  BucketPolicyPublicHtml:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: PublicReadUploadHtmlOnly
+            Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub arn:aws:s3:::${BucketName}/upload.html
+
+Outputs:
+  BucketName:
+    Value: !Ref BucketName
+    Description: Site + uploads + results bucket
+
+  AnalyzeFnName:
+    Value: !Ref AnalyzeFn
+    Description: Lambda function name
+
+  NextSteps:
+    Value: |
+      After deploy:
+      1) aws s3 cp site/upload.html s3://<BucketName>/upload.html --content-type text/html
+      2) aws s3 cp data/jobs.json s3://<BucketName>/jobs/jobs.json
+      3) Create a Cognito Identity Pool (unauth) and attach an IAM policy allowing:
+         - s3:PutObject on arn:aws:s3:::<BucketName>/resumes/*
+         - s3:GetObject  on arn:aws:s3:::<BucketName>/results/*
+      4) Open the S3 Static website endpoint from the bucket Properties to view upload.html.
+    Description: Post-deploy help

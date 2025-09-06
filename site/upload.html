@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Resume Match</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body style="font-family: system-ui; max-width: 640px; margin: 32px auto">
+        <h1>Resume Match</h1>
+
+        <input type="file" id="file" accept="application/pdf" />
+        <button id="uploadBtn">Upload & Analyze</button>
+
+        <pre id="status"></pre>
+        <div id="result"></div>
+
+        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1481.0.min.js"></script>
+        <script>
+            // ---- HARD-CODED CONFIG ----
+            const region = "ap-south-1";
+            const bucket = "resume-match-jmanoj0905-ap-south-1";
+            const identityPoolId =
+                "ap-south-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+
+            AWS.config.region = region;
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                IdentityPoolId: identityPoolId,
+            });
+
+            const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
+            const statusEl = document.getElementById("status");
+            const resultEl = document.getElementById("result");
+
+            function log(s) {
+                statusEl.textContent += s + "\n";
+            }
+
+            async function uploadAndPoll() {
+                const f = document.getElementById("file").files[0];
+                if (!f) {
+                    alert("Choose a PDF");
+                    return;
+                }
+
+                const key = `resumes/${Date.now()}_${encodeURIComponent(f.name)}`;
+                log("Uploading to S3…");
+
+                await AWS.config.credentials.getPromise();
+                await s3
+                    .upload({
+                        Bucket: bucket,
+                        Key: key,
+                        Body: f,
+                        ContentType: "application/pdf",
+                    })
+                    .promise();
+
+                log("Uploaded. Waiting for result…");
+                const resultKey = `results/${key.replace("resumes/", "")}.json`;
+                const maxWaitMs = 120000,
+                    intervalMs = 3000;
+                const start = Date.now();
+
+                async function tryFetch() {
+                    try {
+                        const data = await s3
+                            .getObject({ Bucket: bucket, Key: resultKey })
+                            .promise();
+                        const text = await data.Body.text(); // Blob -> string
+                        const json = JSON.parse(text);
+                        renderResult(json);
+                    } catch (e) {
+                        if (Date.now() - start > maxWaitMs) {
+                            log("Timed out.");
+                            return;
+                        }
+                        setTimeout(tryFetch, intervalMs);
+                    }
+                }
+                tryFetch();
+            }
+
+            function renderResult(r) {
+                resultEl.innerHTML = `
+          <h2>Top Matches</h2>
+          <ol>${r.matches
+              .map(
+                  (m) => `
+            <li>
+              <b>${m.title}</b> — ${m.company} (${m.location})<br>
+              Score: ${m.score.toFixed(3)} | Fit: ${m.fit_score}/100<br>
+              <details><summary>Why</summary><pre>${m.reasons}</pre></details>
+              <details><summary>Strengths</summary><ul>${m.strengths.map((s) => `<li>${s}</li>`).join("")}</ul></details>
+              <details><summary>Gaps</summary><ul>${m.gaps.map((g) => `<li>${g}</li>`).join("")}</ul></details>
+            </li>`,
+              )
+              .join("")}
+          </ol>`;
+                log("Done.");
+            }
+
+            document.getElementById("uploadBtn").onclick = uploadAndPoll;
+        </script>
+    </body>
+</html>

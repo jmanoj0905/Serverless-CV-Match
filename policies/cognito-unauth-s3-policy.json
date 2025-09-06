@@ -1,0 +1,27 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PutResumesAndMultipart",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts"
+      ],
+      "Resource": "arn:aws:s3:::resume-match-jmanoj0905-ap-south-1/resumes/*"
+    },
+    {
+      "Sid": "ListBucketMultipartForResumes",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucketMultipartUploads"],
+      "Resource": "arn:aws:s3:::resume-match-jmanoj0905-ap-south-1"
+    },
+    {
+      "Sid": "GetResults",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:HeadObject"],
+      "Resource": "arn:aws:s3:::resume-match-jmanoj0905-ap-south-1/results/*"
+    }
+  ]
+}

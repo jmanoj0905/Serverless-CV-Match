@@ -1,6 +1,6 @@
 # Resume Match
 
-Upload your PDF résumé → Lambda extracts text (Textract if scanned) → embeds with Amazon Bedrock → compares against jobs in S3 → Bedrock LLM explains the match → results appear in the browser.
+Upload your PDF resume → Lambda extracts text (Textract if scanned) → embeds with Amazon Bedrock → compares against jobs in S3 → Bedrock LLM explains the match → results appear in the browser.
 
 ---
 

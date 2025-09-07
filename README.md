@@ -1,4 +1,4 @@
-# Resume Match
+# Serverless CV Match
 
 Upload your PDF resume → Lambda extracts text (Textract if scanned) → embeds with Amazon Bedrock → compares against jobs in S3 → Bedrock LLM explains the match → results appear in the browser.
 

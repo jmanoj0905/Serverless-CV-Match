@@ -77,14 +77,6 @@ resume-match/
   * Attach the policy from `policies/cognito-unauth-s3-policy.json` (update bucket name if you changed it)
   * Copy the **Identity pool ID** (`ap-south-1:xxxxxxxx-xxxx-...`)
 
-> **Local secret:** put the Identity Pool ID in a local `.env` (do **not** commit):
->
-> ```bash
-> IDENTITY_POOL_ID="ap-south-1:12345678-90ab-cdef-1234-567890abcdef"
-> ```
->
-> `scripts/deploy.sh` injects this ID into a temp copy of `site/upload.html` before uploading.
-
 ---
 
 ## Quick start
